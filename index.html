@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="hi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aura Bot</title>
+<style>
+:root{--bg:#07070d;--card:rgba(255,255,255,.04);--line:rgba(255,255,255,.09);--tx:#eef0ff;--mut:#9ba3c4;--a:#7c5cff;--b:#00d4ff;--c:#ff4fd8;--ok:#57F287}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.bg i{position:absolute;width:55vmax;height:55vmax;border-radius:50%;filter:blur(90px);opacity:.35;animation:fl 18s ease-in-out infinite alternate}
+.bg i:nth-child(1){background:var(--a);top:-20vmax;left:-15vmax}
+.bg i:nth-child(2){background:var(--b);bottom:-25vmax;right:-15vmax;animation-delay:-6s}
+.bg i:nth-child(3){background:var(--c);top:30%;left:40%;width:30vmax;height:30vmax;opacity:.18;animation-delay:-12s}
+@keyframes fl{to{transform:translate(8vmax,6vmax) scale(1.15)}}
+.wrap{max-width:1000px;margin:auto;padding:16px}
+nav{position:sticky;top:10px;z-index:9;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;margin-bottom:22px;border:1px solid var(--line);border-radius:16px;background:rgba(12,12,22,.65);backdrop-filter:blur(14px)}
+.logo{text-decoration:none;font-weight:800;font-size:18px;background:linear-gradient(90deg,var(--b),var(--a),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent}
+.links{display:flex;gap:4px;flex-wrap:wrap}
+.links a{color:var(--mut);text-decoration:none;padding:7px 12px;border-radius:10px;font-size:14px;transition:.2s}
+.links a:hover,.links a.on{color:#fff;background:rgba(255,255,255,.08)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;backdrop-filter:blur(8px);transition:transform .25s,border-color .25s,box-shadow .25s}
+.card:hover{border-color:rgba(124,92,255,.5);box-shadow:0 10px 40px -12px rgba(124,92,255,.45)}
+.mut{color:var(--mut)}
+.btn{display:inline-block;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;text-decoration:none;border:0;border-radius:12px;padding:11px 20px;font-size:15px;font-weight:600;cursor:pointer;transition:.25s;box-shadow:0 8px 24px -8px rgba(124,92,255,.7)}
+.btn:hover{transform:translateY(-2px) scale(1.03)}
+.btn.alt{background:rgba(255,255,255,.07);box-shadow:none;border:1px solid var(--line)}
+.hero{text-align:center;padding:46px 6px 26px}
+.hero h1{font-size:clamp(34px,8vw,62px);line-height:1.05;margin:0 0 14px;font-weight:900;background:linear-gradient(90deg,#fff,var(--b),var(--a),var(--c),#fff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sh 8s linear infinite}
+@keyframes sh{to{background-position:300% 0}}
+.hero p{max-width:560px;margin:0 auto 24px;font-size:17px}
+.pill{display:inline-block;padding:6px 14px;border:1px solid var(--line);border-radius:99px;font-size:13px;color:var(--mut);margin-bottom:18px;background:rgba(255,255,255,.04)}
+.pill:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:8px;animation:pu 1.6s infinite}
+@keyframes pu{50%{opacity:.3;transform:scale(1.6)}}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}
+.stats div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+.stats b{display:block;font-size:26px;font-weight:800}.stats span{color:var(--mut);font-size:13px}
+.grid{display:grid;gap:14px;grid-template-columns:1fr}
+.ic{font-size:30px;margin-bottom:8px;display:inline-block;animation:bob 3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px)}}
+h2.t{font-size:26px;margin:36px 0 14px}
+.rv{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s,border-color .25s,box-shadow .25s}.rv.in{opacity:1;transform:none}
+.cmd{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;border-radius:9px;background:rgba(124,92,255,.14);border:1px solid rgba(124,92,255,.3);font-size:13px;font-family:ui-monospace,monospace}
+.row{padding:5px 0}
+.search,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#10101c;color:var(--tx);font-size:16px}
+.search{margin-bottom:14px}
+.g{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--tx)}
+.g:hover{transform:translateY(-3px)}
+.g img,.ico{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--c));display:flex;align-items:center;justify-content:center;font-weight:800}
+.g div b{display:block}
+label{display:block;margin:14px 0 6px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:14px}td{padding:9px 6px;border-bottom:1px solid var(--line)}
+.two{display:grid;gap:14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1b1b2e;border:1px solid var(--line);padding:12px 20px;border-radius:12px;z-index:99;animation:up .3s}
+@keyframes up{from{opacity:0;transform:translate(-50%,20px)}}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:30px 0 10px}
+@media(min-width:700px){.stats{grid-template-columns:repeat(4,1fr)}.two{grid-template-columns:1fr 1fr}.grid{grid-template-columns:repeat(3,1fr)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style></head><body>
+<div class="bg"><i></i><i></i><i></i></div>
+<div class="wrap">
+<nav><a class="logo" href="#/">✦ <span id="bn">Aura Bot</span></a>
+<div class="links"><a data-p="" href="#/">Home</a><a data-p="commands" href="#/commands">Commands</a><a data-p="dashboard" href="#/dashboard">Dashboard</a><a id="auth" class="btn" style="padding:7px 14px;font-size:13px">Login</a></div></nav>
+<main id="app"></main>
+<footer>Made with ❤️</footer>
+</div>
+<script>
+// ====== SIRF YE EK LINE BADLO: apna Railway domain (end me / nahi) ======
+const API="https://YOUR-APP.up.railway.app";
+// ========================================================================
+const $=s=>document.querySelector(s),app=$("#app");
+const E=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const tok=()=>localStorage.getItem("tk");
+async function api(p,o={}){
+  const h={"Content-Type":"application/json"};if(tok())h.Authorization="Bearer "+tok();
+  const r=await fetch(API+p,{...o,headers:h});
+  if(r.status===401)localStorage.removeItem("tk");
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw Object.assign(new Error(j.error||"error"),{status:r.status});
+  return j}
+const up=s=>Math.floor(s/3600)+"h "+Math.floor(s%3600/60)+"m";
+const toast=m=>{const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)};
+function go(h){
+  app.innerHTML=h;scrollTo(0,0);
+  const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target)}}),{threshold:.1});
+  app.querySelectorAll(".rv").forEach(e=>io.observe(e));
+  app.querySelectorAll("[data-n]").forEach(el=>{const t=+el.dataset.n,s=performance.now();(function f(n){const p=Math.min((n-s)/1200,1);el.textContent=Math.round(t*(1-Math.pow(1-p,3))).toLocaleString();if(p<1)requestAnimationFrame(f)})(s)})}
+const loginCard=()=>`<div class="card" style="text-align:center"><h2>🔐 Login karo</h2><p class="mut">Apne servers manage karne ke liye Discord se login karo.</p><a class="btn" href="${API}/login?site=1">Discord se Login</a></div>`;
+
+async function home(){
+  let s={servers:0,users:0,commands:0,uptime:0,invite:"#",name:"Aura Bot"};
+  try{s=await api("/api/stats");$("#bn").textContent=s.name}catch(e){}
+  const F=[["🎵","Music","YouTube/SoundCloud se gaane, queue, loop, shuffle."],["🗣️","TTS","Chat me likho, bot voice me bolega. Hindi + 8 languages."],["🛡️","Moderation","Kick, ban, timeout, warn, lock, slowmode aur logs."],["💰","Economy","Daily, work, slots, gamble aur leaderboard."],["📈","Levels","Chat karo, XP kamao, level up pe coins pao."],["🎫","Tickets","Private support ticket, welcome message aur auto role."]];
+  go(`<div class="hero"><div class="pill">Online 24/7</div><h1>Sabka all-rounder<br>Discord Bot</h1><p class="mut">Music, TTS, moderation, economy, levels aur ek premium dashboard. Sab ek hi bot me.</p><a class="btn" href="#/dashboard">Dashboard kholo</a> <a class="btn alt" href="${E(s.invite)}">➕ Bot add karo</a></div>
+  <div class="stats rv"><div><b data-n="${+s.servers}">0</b><span>Servers</span></div><div><b data-n="${+s.users}">0</b><span>Users</span></div><div><b data-n="${+s.commands}">0</b><span>Commands</span></div><div><b>${up(+s.uptime)}</b><span>Uptime</span></div></div>
+  <h2 class="t rv">✨ Features</h2><div class="grid">${F.map(f=>`<div class="card rv"><div class="ic">${f[0]}</div><h3 style="margin:0 0 6px">${f[1]}</h3><div class="mut">${f[2]}</div></div>`).join("")}</div>
+  <div class="card rv" style="text-align:center;margin-top:20px"><h2 style="margin-top:0">Taiyaar ho?</h2><a class="btn" href="${E(s.invite)}">➕ Bot add karo</a> <a class="btn alt" href="#/commands">📖 Saari commands</a></div>`)}
+
+async function cmds(){
+  const d=await api("/api/commands"),n=Object.values(d).flat().length;
+  go(`<h2 class="t">📖 Commands (${n})</h2><input id="q" class="search" placeholder="🔎 Command dhundo...">`+Object.entries(d).map(([k,v])=>`<div class="card cc rv in"><h3 style="margin-top:0">${E(k)}</h3>${v.map(c=>`<div class="row"><span class="cmd">/${E(c.n)}</span><span class="mut">${E(c.d)}</span></div>`).join("")}</div>`).join(""));
+  $("#q").oninput=e=>{const v=e.target.value.toLowerCase();app.querySelectorAll(".cc").forEach(c=>{let a=0;c.querySelectorAll(".row").forEach(r=>{const m=r.textContent.toLowerCase().includes(v);r.style.display=m?"":"none";if(m)a=1});c.style.display=a?"":"none"})}}
+
+async function dash(){
+  if(!tok())return go(loginCard());
+  const m=await api("/api/me");
+  go(`<h2 class="t">Hey ${E(m.user.name)} 👋</h2>`+(m.guilds.map(g=>`<a class="card g rv in" href="#/dashboard/${E(g.id)}">${g.icon?`<img src="${E(g.icon)}" alt="">`:`<div class="ico">${E(g.name[0])}</div>`}<div><b>${E(g.name)}</b><span class="mut">${+g.members} members</span></div></a>`).join("")||`<div class="card">Koi server nahi mila jahan tum <b>Manage Server</b> permission wale ho aur bot bhi hai.</div>`))}
+
+async function guild(id){
+  if(!tok())return go(loginCard());
+  const g=await api("/api/guild/"+encodeURIComponent(id));
+  const op=(a,sel,p="")=>'<option value="">— koi nahi —</option>'+a.map(x=>`<option value="${E(x.id)}"${x.id===sel?" selected":""}>${p+E(x.name)}</option>`).join("");
+  const tb=(a,f)=>`<table>${a.map((x,i)=>`<tr><td>${i+1}</td><td>${E(x.name)}</td><td>${f(x)}</td></tr>`).join("")||'<tr><td class="mut">Abhi data nahi</td></tr>'}</table>`;
+  go(`<p><a class="mut" href="#/dashboard">← Servers</a></p><h2 class="t" style="margin-top:6px">${E(g.name)}</h2>
+  <div class="stats"><div><b data-n="${+g.members}">0</b><span>Members</span></div><div><b data-n="${g.channels.length}">0</b><span>Channels</span></div><div><b data-n="${g.roles.length}">0</b><span>Roles</span></div><div><b data-n="${+g.warns}">0</b><span>Warnings</span></div></div>
+  <form id="f" class="card"><h3 style="margin-top:0">⚙️ Settings</h3>
+  <label>👋 Welcome / Goodbye channel</label><select id="welcome">${op(g.channels,g.settings.welcome,"#")}</select>
+  <label>🎭 Auto role</label><select id="autorole">${op(g.roles,g.settings.autorole)}</select>
+  <label>📜 Log channel</label><select id="log">${op(g.channels,g.settings.log,"#")}</select>
+  <p><button class="btn" type="submit">💾 Save</button></p></form>
+  <div class="two"><div class="card"><h3 style="margin-top:0">💰 Coins Top 10</h3>${tb(g.coins,x=>(+x.v).toLocaleString())}</div><div class="card"><h3 style="margin-top:0">📈 XP Top 10</h3>${tb(g.xp,x=>"Lvl "+(+x.lvl)+" ("+(+x.v)+" XP)")}</div></div>`);
+  $("#f").onsubmit=async e=>{e.preventDefault();const b={};["welcome","autorole","log"].forEach(k=>b[k]=$("#"+k).value);
+    try{await api("/api/guild/"+encodeURIComponent(id),{method:"POST",body:JSON.stringify(b)});toast("✅ Save ho gaya!")}catch(x){toast("❌ Save nahi hua")}}}
+
+async function route(){
+  if(location.hash.startsWith("#token=")){localStorage.setItem("tk",location.hash.slice(7));location.hash="#/dashboard";return}
+  const [,p,id]=(location.hash.slice(1)||"/").split("/");
+  document.querySelectorAll(".links a[data-p]").forEach(a=>a.classList.toggle("on",a.dataset.p===(p||"")));
+  const au=$("#auth");
+  if(tok()){au.textContent="Logout";au.href="#/";au.onclick=()=>{localStorage.removeItem("tk");setTimeout(route)}}
+  else{au.textContent="Login";au.href=API+"/login?site=1";au.onclick=null}
+  try{if(p==="commands")await cmds();else if(p==="dashboard")await(id?guild(id):dash());else await home()}
+  catch(e){go(e.status===401?loginCard():`<div class="card">⚠️ Bot se connect nahi ho paya. Bot online hai? <span class="mut">(${E(e.message)})</span></div>`)}}
+addEventListener("hashchange",route);route();
+</script></body></html>
