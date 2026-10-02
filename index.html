@@ -50,6 +50,13 @@ h2.t{font-size:26px;margin:36px 0 14px}
 label{display:block;margin:14px 0 6px;font-weight:600}
 table{width:100%;border-collapse:collapse;font-size:14px}td{padding:9px 6px;border-bottom:1px solid var(--line)}
 .two{display:grid;gap:14px}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding-bottom:4px}
+.tab{flex:none;background:var(--card);border:1px solid var(--line);color:var(--mut);padding:9px 16px;border-radius:12px;font-size:14px;cursor:pointer;transition:.2s}
+.tab:hover{color:#fff}.tab.on{color:#fff;background:linear-gradient(135deg,var(--a),var(--b));border-color:transparent;box-shadow:0 8px 22px -8px rgba(124,92,255,.8)}
+.bar{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--b),var(--c));width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1);margin-top:5px}
+.ta{width:100%;min-height:96px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#10101c;color:var(--tx);font-size:16px;font-family:inherit;resize:vertical}
+.sec{animation:up2 .45s}@keyframes up2{from{opacity:0;transform:translateY(14px)}}
+.big b{font-size:30px;background:linear-gradient(90deg,var(--b),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1b1b2e;border:1px solid var(--line);padding:12px 20px;border-radius:12px;z-index:99;animation:up .3s}
 @keyframes up{from{opacity:0;transform:translate(-50%,20px)}}
 footer{text-align:center;color:var(--mut);font-size:13px;padding:30px 0 10px}
@@ -90,10 +97,10 @@ async function home(){
   let s={servers:0,users:0,commands:0,uptime:0,invite:"#",name:"Aura Bot"};
   try{s=await api("/api/stats");$("#bn").textContent=s.name}catch(e){}
   const F=[["🎵","Music","YouTube/SoundCloud se gaane, queue, loop, shuffle."],["🗣️","TTS","Chat me likho, bot voice me bolega. Hindi + 8 languages."],["🛡️","Moderation","Kick, ban, timeout, warn, lock, slowmode aur logs."],["💰","Economy","Daily, work, slots, gamble aur leaderboard."],["📈","Levels","Chat karo, XP kamao, level up pe coins pao."],["🎫","Tickets","Private support ticket, welcome message aur auto role."]];
-  go(`<div class="hero"><div class="pill">Online 24/7</div><h1>Sabka all-rounder<br>Discord Bot</h1><p class="mut">Music, TTS, moderation, economy, levels aur ek premium dashboard. Sab ek hi bot me.</p><a class="btn" href="#/dashboard">Dashboard kholo</a> <a class="btn alt" href="${E(s.invite)}">➕ Bot add karo</a></div>
+  go(`<div class="hero"><div class="pill">Online 24/7</div><h1>Sabka all-rounder<br>Discord Bot</h1><p class="mut">Music, TTS, moderation, economy, levels aur ek premium dashboard. Sab ek hi bot me.</p><a class="btn" href="#/dashboard">🚀 Dashboard kholo</a> <a class="btn alt" href="#/commands">📖 Commands</a></div>
   <div class="stats rv"><div><b data-n="${+s.servers}">0</b><span>Servers</span></div><div><b data-n="${+s.users}">0</b><span>Users</span></div><div><b data-n="${+s.commands}">0</b><span>Commands</span></div><div><b>${up(+s.uptime)}</b><span>Uptime</span></div></div>
   <h2 class="t rv">✨ Features</h2><div class="grid">${F.map(f=>`<div class="card rv"><div class="ic">${f[0]}</div><h3 style="margin:0 0 6px">${f[1]}</h3><div class="mut">${f[2]}</div></div>`).join("")}</div>
-  <div class="card rv" style="text-align:center;margin-top:20px"><h2 style="margin-top:0">Taiyaar ho?</h2><a class="btn" href="${E(s.invite)}">➕ Bot add karo</a> <a class="btn alt" href="#/commands">📖 Saari commands</a></div>`)}
+  <div class="card rv" style="text-align:center;margin-top:20px"><h2 style="margin-top:0">Taiyaar ho?</h2><a class="btn" href="#/dashboard">🚀 Dashboard kholo</a> <a class="btn alt" href="#/commands">📖 Saari commands</a></div>`)}
 
 async function cmds(){
   const d=await api("/api/commands"),n=Object.values(d).flat().length;
@@ -103,23 +110,39 @@ async function cmds(){
 async function dash(){
   if(!tok())return go(loginCard());
   const m=await api("/api/me");
-  go(`<h2 class="t">Hey ${E(m.user.name)} 👋</h2>`+(m.guilds.map(g=>`<a class="card g rv in" href="#/dashboard/${E(g.id)}">${g.icon?`<img src="${E(g.icon)}" alt="">`:`<div class="ico">${E(g.name[0])}</div>`}<div><b>${E(g.name)}</b><span class="mut">${+g.members} members</span></div></a>`).join("")||`<div class="card">Koi server nahi mila jahan tum <b>Manage Server</b> permission wale ho aur bot bhi hai.</div>`))}
+  go(`<h2 class="t">Hey ${E(m.user.name)} 👋</h2>`+(m.guilds.map(g=>`<a class="card g rv in" href="#/dashboard/${E(g.id)}">${g.icon?`<img src="${E(g.icon)}" alt="">`:`<div class="ico">${E(g.name[0])}</div>`}<div><b>${E(g.name)}</b><span class="mut">${+g.members} members</span></div></a>`).join("")||`<div class="card">Koi server nahi mila jahan tum <b>Administrator</b> ho aur bot bhi hai.</div>`))}
 
 async function guild(id){
   if(!tok())return go(loginCard());
-  const g=await api("/api/guild/"+encodeURIComponent(id));
+  const g=await api("/api/guild/"+encodeURIComponent(id)),P="/api/guild/"+encodeURIComponent(id);
   const op=(a,sel,p="")=>'<option value="">— koi nahi —</option>'+a.map(x=>`<option value="${E(x.id)}"${x.id===sel?" selected":""}>${p+E(x.name)}</option>`).join("");
   const tb=(a,f)=>`<table>${a.map((x,i)=>`<tr><td>${i+1}</td><td>${E(x.name)}</td><td>${f(x)}</td></tr>`).join("")||'<tr><td class="mut">Abhi data nahi</td></tr>'}</table>`;
+  const mx=Math.max(1,...g.today.map(x=>+x.v));
+  const board=g.today.map((x,i)=>`<div class="row"><div style="display:flex;justify-content:space-between"><span>${i+1}. ${E(x.name)}</span><b>${+x.v} msgs</b></div><div class="bar" data-w="${Math.round(x.v/mx*100)}"></div></div>`).join("")||'<div class="mut">Aaj abhi koi message nahi.</div>';
+  const C=n=>`<option value="">— channel chuno —</option>`+g.channels.map(x=>`<option value="${E(x.id)}">#${E(x.name)}</option>`).join("");
   go(`<p><a class="mut" href="#/dashboard">← Servers</a></p><h2 class="t" style="margin-top:6px">${E(g.name)}</h2>
-  <div class="stats"><div><b data-n="${+g.members}">0</b><span>Members</span></div><div><b data-n="${g.channels.length}">0</b><span>Channels</span></div><div><b data-n="${g.roles.length}">0</b><span>Roles</span></div><div><b data-n="${+g.warns}">0</b><span>Warnings</span></div></div>
-  <form id="f" class="card"><h3 style="margin-top:0">⚙️ Settings</h3>
+  <div class="tabs"><div class="tab on" data-t="ov">📊 Overview</div><div class="tab" data-t="st">⚙️ Settings</div><div class="tab" data-t="an">📢 Announce</div><div class="tab" data-t="wr">⚠️ Warnings</div></div>
+  <section id="t-ov" class="sec"><div class="stats big"><div><b data-n="${+g.members}">0</b><span>Members</span></div><div><b data-n="${+g.msgs_today}">0</b><span>Aaj ke messages</span></div><div><b data-n="${+g.active_today}">0</b><span>Aaj active</span></div><div><b data-n="${+g.warns}">0</b><span>Warnings</span></div></div>
+  <div class="card"><h3 style="margin-top:0">🔥 Aaj ka Leaderboard</h3>${board}</div>
+  <div class="two"><div class="card"><h3 style="margin-top:0">💰 Coins Top 10</h3>${tb(g.coins,x=>(+x.v).toLocaleString())}</div><div class="card"><h3 style="margin-top:0">📈 XP Top 10</h3>${tb(g.xp,x=>"Lvl "+(+x.lvl)+" ("+(+x.v)+" XP)")}</div></div></section>
+  <section id="t-st" class="sec" hidden><form id="f" class="card"><h3 style="margin-top:0">⚙️ Server Settings</h3>
   <label>👋 Welcome / Goodbye channel</label><select id="welcome">${op(g.channels,g.settings.welcome,"#")}</select>
+  <label>💬 Welcome message <span class="mut" style="font-weight:400">({user} {server} {count})</span></label><textarea id="wm" class="ta" maxlength="300" placeholder="{user} {server} me swagat hai! Ab hum {count} log hain.">${E(g.welcome_msg)}</textarea>
   <label>🎭 Auto role</label><select id="autorole">${op(g.roles,g.settings.autorole)}</select>
   <label>📜 Log channel</label><select id="log">${op(g.channels,g.settings.log,"#")}</select>
-  <p><button class="btn" type="submit">💾 Save</button></p></form>
-  <div class="two"><div class="card"><h3 style="margin-top:0">💰 Coins Top 10</h3>${tb(g.coins,x=>(+x.v).toLocaleString())}</div><div class="card"><h3 style="margin-top:0">📈 XP Top 10</h3>${tb(g.xp,x=>"Lvl "+(+x.lvl)+" ("+(+x.v)+" XP)")}</div></div>`);
-  $("#f").onsubmit=async e=>{e.preventDefault();const b={};["welcome","autorole","log"].forEach(k=>b[k]=$("#"+k).value);
-    try{await api("/api/guild/"+encodeURIComponent(id),{method:"POST",body:JSON.stringify(b)});toast("✅ Save ho gaya!")}catch(x){toast("❌ Save nahi hua")}}}
+  <p><button class="btn" type="submit">💾 Save</button></p></form></section>
+  <section id="t-an" class="sec" hidden><form id="af" class="card"><h3 style="margin-top:0">📢 Announcement bhejo</h3>
+  <label>Channel</label><select id="ac">${C()}</select>
+  <label>Title</label><input id="at" class="search" maxlength="100" placeholder="📢 Announcement" style="margin:0">
+  <label>Message</label><textarea id="am" class="ta" maxlength="1500" placeholder="Yahan likho..."></textarea>
+  <p><button class="btn" type="submit">🚀 Bhejo</button></p></form></section>
+  <section id="t-wr" class="sec" hidden><div class="card"><h3 style="margin-top:0">⚠️ Recent Warnings</h3><table>${g.warn_list.map(w=>`<tr><td>${E(w.name)}</td><td>${E(w.reason)}</td><td class="mut">${new Date(w.ts*1000).toLocaleDateString()}</td></tr>`).join("")||'<tr><td class="mut">Koi warning nahi 🎉</td></tr>'}</table></div></section>`);
+  setTimeout(()=>app.querySelectorAll(".bar").forEach(b=>b.style.width=b.dataset.w+"%"),150);
+  app.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{app.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===t));["ov","st","an","wr"].forEach(k=>$("#t-"+k).hidden=k!==t.dataset.t);if(t.dataset.t==="ov")setTimeout(()=>app.querySelectorAll(".bar").forEach(b=>b.style.width=b.dataset.w+"%"),50)});
+  $("#f").onsubmit=async e=>{e.preventDefault();const b={welcome_msg:$("#wm").value};["welcome","autorole","log"].forEach(k=>b[k]=$("#"+k).value);
+    try{await api(P,{method:"POST",body:JSON.stringify(b)});toast("✅ Save ho gaya!")}catch(x){toast("❌ Save nahi hua")}};
+  $("#af").onsubmit=async e=>{e.preventDefault();
+    try{await api(P+"/announce",{method:"POST",body:JSON.stringify({channel:$("#ac").value,title:$("#at").value,text:$("#am").value})});toast("✅ Announcement bhej diya!");$("#am").value=""}catch(x){toast(x.message==="slow"?"⏳ 5 second ruko":"❌ Channel aur message daalo")}}}
 
 async function route(){
   if(location.hash.startsWith("#token=")){localStorage.setItem("tk",location.hash.slice(7));location.hash="#/dashboard";return}
