@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="hi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Aura Bot</title>
+<title>Aura Bot Dashboard</title><meta name="description" content="Aura Bot ka professional dashboard: server settings, leaderboard aur announcements."><meta name="theme-color" content="#07070d"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>✦</text></svg>">
 <style>
 :root{--bg:#07070d;--card:rgba(255,255,255,.04);--line:rgba(255,255,255,.09);--tx:#eef0ff;--mut:#9ba3c4;--a:#7c5cff;--b:#00d4ff;--c:#ff4fd8;--ok:#57F287}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
@@ -57,6 +57,16 @@ table{width:100%;border-collapse:collapse;font-size:14px}td{padding:9px 6px;bord
 .ta{width:100%;min-height:96px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#10101c;color:var(--tx);font-size:16px;font-family:inherit;resize:vertical}
 .sec{animation:up2 .45s}@keyframes up2{from{opacity:0;transform:translateY(14px)}}
 .big b{font-size:30px;background:linear-gradient(90deg,var(--b),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lay{display:block}
+@media(min-width:800px){.lay{display:grid;grid-template-columns:210px 1fr;gap:18px;align-items:start}.lay .tabs{flex-direction:column;position:sticky;top:90px;overflow:visible}}
+.dbtn{display:inline-flex;align-items:center;gap:10px;background:#5865F2;color:#fff;text-decoration:none;padding:13px 24px;border-radius:12px;font-weight:700;font-size:16px;box-shadow:0 10px 30px -10px #5865F2;transition:.25s}.dbtn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.av{width:28px;height:28px;border-radius:50%;vertical-align:middle;margin-right:6px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.sk{height:90px;border-radius:18px;margin-bottom:14px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.1),rgba(255,255,255,.04));background-size:200% 100%;animation:skm 1.2s linear infinite}@keyframes skm{to{background-position:-200% 0}}
+.gh{display:flex;align-items:center;gap:14px;margin:6px 0 16px}.gh img,.gh .ico{width:60px;height:60px}.gh h2{margin:0}
+.badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(87,242,135,.12);border:1px solid rgba(87,242,135,.35);color:var(--ok)}
+.step{display:flex;gap:14px;align-items:flex-start}.step i{flex:none;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--c));display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:800}
+.fl{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}.fl a{color:var(--mut);text-decoration:none}.fl a:hover{color:#fff}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1b1b2e;border:1px solid var(--line);padding:12px 20px;border-radius:12px;z-index:99;animation:up .3s}
 @keyframes up{from{opacity:0;transform:translate(-50%,20px)}}
 footer{text-align:center;color:var(--mut);font-size:13px;padding:30px 0 10px}
@@ -66,9 +76,9 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:30px 0 10px}
 <div class="bg"><i></i><i></i><i></i></div>
 <div class="wrap">
 <nav><a class="logo" href="#/">✦ <span id="bn">Aura Bot</span></a>
-<div class="links"><a data-p="" href="#/">Home</a><a data-p="commands" href="#/commands">Commands</a><a data-p="dashboard" href="#/dashboard">Dashboard</a><a id="auth" class="btn" style="padding:7px 14px;font-size:13px">Login</a></div></nav>
+<div class="links"><a data-p="" href="#/">Home</a><a data-p="commands" href="#/commands">Commands</a><a data-p="dashboard" href="#/dashboard">Dashboard</a><span id="who"></span><a id="auth" class="btn" style="padding:7px 14px;font-size:13px">Login</a></div></nav>
 <main id="app"></main>
-<footer>Made with ❤️</footer>
+<footer><div class="fl"><a href="#/">Home</a><a href="#/commands">Commands</a><a href="#/dashboard">Dashboard</a></div>© Aura Bot • Made with ❤️</footer>
 </div>
 <script>
 // ====== SIRF YE EK LINE BADLO: apna Railway domain (end me / nahi) ======
@@ -91,7 +101,7 @@ function go(h){
   const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target)}}),{threshold:.1});
   app.querySelectorAll(".rv").forEach(e=>io.observe(e));
   app.querySelectorAll("[data-n]").forEach(el=>{const t=+el.dataset.n,s=performance.now();(function f(n){const p=Math.min((n-s)/1200,1);el.textContent=Math.round(t*(1-Math.pow(1-p,3))).toLocaleString();if(p<1)requestAnimationFrame(f)})(s)})}
-const loginCard=()=>`<div class="card" style="text-align:center"><h2>🔐 Login karo</h2><p class="mut">Apne servers manage karne ke liye Discord se login karo.</p><a class="btn" href="${API}/login?site=1">Discord se Login</a></div>`;
+const loginCard=()=>`<div class="card" style="text-align:center;padding:36px 18px"><div class="ic">🔐</div><h2 style="margin:0 0 8px">Dashboard me login karo</h2><p class="mut" style="max-width:420px;margin:0 auto 22px">Discord se authorize karo. Hum sirf tumhara username aur servers ki list dekhte hain, password kabhi nahi. Sirf <b>Administrator</b> wale hi server manage kar sakte hain.</p><a class="dbtn" href="${API}/login?site=1">Discord se Authorize karo</a></div>`;
 
 async function home(){
   let s={servers:0,users:0,commands:0,uptime:0,invite:"#",name:"Aura Bot"};
@@ -100,12 +110,14 @@ async function home(){
   go(`<div class="hero"><div class="pill">Online 24/7</div><h1>Sabka all-rounder<br>Discord Bot</h1><p class="mut">Music, TTS, moderation, economy, levels aur ek premium dashboard. Sab ek hi bot me.</p><a class="btn" href="#/dashboard">🚀 Dashboard kholo</a> <a class="btn alt" href="#/commands">📖 Commands</a></div>
   <div class="stats rv"><div><b data-n="${+s.servers}">0</b><span>Servers</span></div><div><b data-n="${+s.users}">0</b><span>Users</span></div><div><b data-n="${+s.commands}">0</b><span>Commands</span></div><div><b>${up(+s.uptime)}</b><span>Uptime</span></div></div>
   <h2 class="t rv">✨ Features</h2><div class="grid">${F.map(f=>`<div class="card rv"><div class="ic">${f[0]}</div><h3 style="margin:0 0 6px">${f[1]}</h3><div class="mut">${f[2]}</div></div>`).join("")}</div>
+  <h2 class="t rv">🧭 3 step me shuru</h2><div class="grid">${[["Login","Discord se authorize karo."],["Server chuno","Jahan tum Administrator ho."],["Manage karo","Settings, announcements, leaderboard."]].map((x,i)=>`<div class="card step rv"><i>${i+1}</i><div><b>${x[0]}</b><div class="mut">${x[1]}</div></div></div>`).join("")}</div>
   <div class="card rv" style="text-align:center;margin-top:20px"><h2 style="margin-top:0">Taiyaar ho?</h2><a class="btn" href="#/dashboard">🚀 Dashboard kholo</a> <a class="btn alt" href="#/commands">📖 Saari commands</a></div>`)}
 
 async function cmds(){
   const d=await api("/api/commands"),n=Object.values(d).flat().length;
-  go(`<h2 class="t">📖 Commands (${n})</h2><input id="q" class="search" placeholder="🔎 Command dhundo...">`+Object.entries(d).map(([k,v])=>`<div class="card cc rv in"><h3 style="margin-top:0">${E(k)}</h3>${v.map(c=>`<div class="row"><span class="cmd">/${E(c.n)}</span><span class="mut">${E(c.d)}</span></div>`).join("")}</div>`).join(""));
-  $("#q").oninput=e=>{const v=e.target.value.toLowerCase();app.querySelectorAll(".cc").forEach(c=>{let a=0;c.querySelectorAll(".row").forEach(r=>{const m=r.textContent.toLowerCase().includes(v);r.style.display=m?"":"none";if(m)a=1});c.style.display=a?"":"none"})}}
+  go(`<h2 class="t">📖 Commands (${n})</h2><input id="q" class="search" placeholder="🔎 Command dhundo..."><div class="chips"><div class="tab on" data-c="">Sab</div>${Object.keys(d).map(k=>`<div class="tab" data-c="${E(k)}">${E(k)}</div>`).join("")}</div>`+Object.entries(d).map(([k,v])=>`<div class="card cc rv in" data-c="${E(k)}"><h3 style="margin-top:0">${E(k)}</h3>${v.map(c=>`<div class="row"><span class="cmd">/${E(c.n)}</span><span class="mut">${E(c.d)}</span></div>`).join("")}</div>`).join(""));
+  const ap=()=>{const v=$("#q").value.toLowerCase(),c=app.querySelector(".chips .on").dataset.c;app.querySelectorAll(".cc").forEach(x=>{let a=0;if(!c||x.dataset.c===c)x.querySelectorAll(".row").forEach(r=>{const m=r.textContent.toLowerCase().includes(v);r.style.display=m?"":"none";if(m)a=1});x.style.display=a?"":"none"})};
+  $("#q").oninput=ap;app.querySelectorAll(".chips .tab").forEach(t=>t.onclick=()=>{app.querySelectorAll(".chips .tab").forEach(x=>x.classList.toggle("on",x===t));ap()})}
 
 async function dash(){
   if(!tok())return go(loginCard());
@@ -120,8 +132,8 @@ async function guild(id){
   const mx=Math.max(1,...g.today.map(x=>+x.v));
   const board=g.today.map((x,i)=>`<div class="row"><div style="display:flex;justify-content:space-between"><span>${i+1}. ${E(x.name)}</span><b>${+x.v} msgs</b></div><div class="bar" data-w="${Math.round(x.v/mx*100)}"></div></div>`).join("")||'<div class="mut">Aaj abhi koi message nahi.</div>';
   const C=n=>`<option value="">— channel chuno —</option>`+g.channels.map(x=>`<option value="${E(x.id)}">#${E(x.name)}</option>`).join("");
-  go(`<p><a class="mut" href="#/dashboard">← Servers</a></p><h2 class="t" style="margin-top:6px">${E(g.name)}</h2>
-  <div class="tabs"><div class="tab on" data-t="ov">📊 Overview</div><div class="tab" data-t="st">⚙️ Settings</div><div class="tab" data-t="an">📢 Announce</div><div class="tab" data-t="wr">⚠️ Warnings</div></div>
+  go(`<p><a class="mut" href="#/dashboard">← Servers</a></p><div class="gh">${g.icon?`<img src="${E(g.icon)}" class="ico" alt="">`:`<div class="ico">${E(g.name[0])}</div>`}<div><h2>${E(g.name)}</h2><span class="badge">● Bot online • Administrator</span></div></div>
+  <div class="lay"><div class="tabs"><div class="tab on" data-t="ov">📊 Overview</div><div class="tab" data-t="st">⚙️ Settings</div><div class="tab" data-t="an">📢 Announce</div><div class="tab" data-t="wr">⚠️ Warnings</div></div><div>
   <section id="t-ov" class="sec"><div class="stats big"><div><b data-n="${+g.members}">0</b><span>Members</span></div><div><b data-n="${+g.msgs_today}">0</b><span>Aaj ke messages</span></div><div><b data-n="${+g.active_today}">0</b><span>Aaj active</span></div><div><b data-n="${+g.warns}">0</b><span>Warnings</span></div></div>
   <div class="card"><h3 style="margin-top:0">🔥 Aaj ka Leaderboard</h3>${board}</div>
   <div class="two"><div class="card"><h3 style="margin-top:0">💰 Coins Top 10</h3>${tb(g.coins,x=>(+x.v).toLocaleString())}</div><div class="card"><h3 style="margin-top:0">📈 XP Top 10</h3>${tb(g.xp,x=>"Lvl "+(+x.lvl)+" ("+(+x.v)+" XP)")}</div></div></section>
@@ -136,7 +148,7 @@ async function guild(id){
   <label>Title</label><input id="at" class="search" maxlength="100" placeholder="📢 Announcement" style="margin:0">
   <label>Message</label><textarea id="am" class="ta" maxlength="1500" placeholder="Yahan likho..."></textarea>
   <p><button class="btn" type="submit">🚀 Bhejo</button></p></form></section>
-  <section id="t-wr" class="sec" hidden><div class="card"><h3 style="margin-top:0">⚠️ Recent Warnings</h3><table>${g.warn_list.map(w=>`<tr><td>${E(w.name)}</td><td>${E(w.reason)}</td><td class="mut">${new Date(w.ts*1000).toLocaleDateString()}</td></tr>`).join("")||'<tr><td class="mut">Koi warning nahi 🎉</td></tr>'}</table></div></section>`);
+  <section id="t-wr" class="sec" hidden><div class="card"><h3 style="margin-top:0">⚠️ Recent Warnings</h3><table>${g.warn_list.map(w=>`<tr><td>${E(w.name)}</td><td>${E(w.reason)}</td><td class="mut">${new Date(w.ts*1000).toLocaleDateString()}</td></tr>`).join("")||'<tr><td class="mut">Koi warning nahi 🎉</td></tr>'}</table></div></section></div></div>`);
   setTimeout(()=>app.querySelectorAll(".bar").forEach(b=>b.style.width=b.dataset.w+"%"),150);
   app.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{app.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===t));["ov","st","an","wr"].forEach(k=>$("#t-"+k).hidden=k!==t.dataset.t);if(t.dataset.t==="ov")setTimeout(()=>app.querySelectorAll(".bar").forEach(b=>b.style.width=b.dataset.w+"%"),50)});
   $("#f").onsubmit=async e=>{e.preventDefault();const b={welcome_msg:$("#wm").value};["welcome","autorole","log"].forEach(k=>b[k]=$("#"+k).value);
@@ -144,13 +156,19 @@ async function guild(id){
   $("#af").onsubmit=async e=>{e.preventDefault();
     try{await api(P+"/announce",{method:"POST",body:JSON.stringify({channel:$("#ac").value,title:$("#at").value,text:$("#am").value})});toast("✅ Announcement bhej diya!");$("#am").value=""}catch(x){toast(x.message==="slow"?"⏳ 5 second ruko":"❌ Channel aur message daalo")}}}
 
+let ME=null;
+async function who(){const w=$("#who");if(!tok()){ME=null;w.innerHTML="";return}
+  if(!ME){try{ME=await api("/api/me")}catch(e){return}}
+  w.innerHTML=ME.user.avatar?`<img class="av" src="${E(ME.user.avatar)}" alt="">`:""}
 async function route(){
+  if(API.includes("YOUR-APP"))return go('<div class="card">⚙️ Setup baaki: <code>index.html</code> me <code>API</code> wali line me apna Railway domain daalo.</div>');
   if(location.hash.startsWith("#token=")){localStorage.setItem("tk",location.hash.slice(7));location.hash="#/dashboard";return}
   const [,p,id]=(location.hash.slice(1)||"/").split("/");
   document.querySelectorAll(".links a[data-p]").forEach(a=>a.classList.toggle("on",a.dataset.p===(p||"")));
   const au=$("#auth");
   if(tok()){au.textContent="Logout";au.href="#/";au.onclick=()=>{localStorage.removeItem("tk");setTimeout(route)}}
   else{au.textContent="Login";au.href=API+"/login?site=1";au.onclick=null}
+  who();app.innerHTML='<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
   try{if(p==="commands")await cmds();else if(p==="dashboard")await(id?guild(id):dash());else await home()}
   catch(e){go(e.status===401?loginCard():`<div class="card">⚠️ Bot se connect nahi ho paya. Bot online hai? <span class="mut">(${E(e.message)})</span></div>`)}}
 addEventListener("hashchange",route);route();
