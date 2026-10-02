@@ -88,12 +88,13 @@ table{font-size:15px}td{border-bottom:1px solid rgba(255,255,255,.09)}
 <nav class="panel"><a class="logo" href="#/">✦ <span id="bn">AURA BOT</span></a>
 <div class="links"><a class="l" data-p="" href="#/">Home</a><a class="l" data-p="dashboard" href="#/dashboard">Dashboard</a><a class="l" data-p="commands" href="#/commands">Commands</a><a id="th" class="btn sm">🎨 Theme</a><span id="who"></span><a id="auth" class="btn g sm">Login</a></div></nav>
 <main id="app"></main>
-<footer>✦ Made with ❤ • Aura Bot</footer>
+<footer>✦ Made with ❤ • Aura Bot • <a href="#/" id="rst" style="color:#9ba3c4">⚙ Domain badlo</a></footer>
 </div>
 <script>
-// ====== SIRF YE EK LINE BADLO: apna Railway domain (end me / nahi) ======
-const API="https://YOUR-APP.up.railway.app";
-// ========================================================================
+const DEFAULT_API=""; // optional: Railway domain yahan bhi daal sakte ho, warna site khud puchegi
+const qa=new URLSearchParams(location.search).get("api");if(qa){localStorage.setItem("api",qa.replace(/\/$/,""));history.replaceState(null,"",location.pathname+location.hash)}
+let API=localStorage.getItem("api")||DEFAULT_API;
+function relog(){if(localStorage.getItem("seen")&&!sessionStorage.getItem("rl")){sessionStorage.setItem("rl","1");location.href=API+"/login?site=1"}}
 const $=s=>document.querySelector(s),app=$("#app");
 const E=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const tok=()=>localStorage.getItem("tk");
@@ -102,7 +103,7 @@ const up=s=>Math.floor(s/3600)+"h "+Math.floor(s%3600/60)+"m";
 async function api(p,o={}){
   const h={"Content-Type":"application/json"};if(tok())h.Authorization="Bearer "+tok();
   const r=await fetch(API+p,{...o,headers:h});
-  if(r.status===401)localStorage.removeItem("tk");
+  if(r.status===401){localStorage.removeItem("tk");relog()}
   const j=await r.json().catch(()=>({}));
   if(!r.ok)throw Object.assign(new Error(j.error||"error"),{status:r.status});
   return j}
@@ -112,6 +113,8 @@ function go(h){app.innerHTML=h;scrollTo(0,0);
   setTimeout(()=>app.querySelectorAll(".bar i").forEach(b=>b.style.width=b.dataset.w+"%"),120)}
 const loginCard=()=>`<div class="panel" style="text-align:center;padding:34px 16px"><span class="ic">🔐</span><h2 style="font-size:14px;line-height:1.6">Dashboard me login karo</h2><p class="mut" style="max-width:480px;margin:0 auto 20px">Discord se authorize karo. Hum sirf tumhara username aur servers ki list dekhte hain. Sirf <b>Administrator</b> wale hi server manage kar sakte hain.</p><a class="btn d" href="${API}/login?site=1">Discord se Authorize karo</a></div>`;
 
+function setup(){go(`<div class="panel" style="text-align:center;padding:30px 16px"><span class="ic">⚙️</span><h2 class="t" style="margin-top:0">Bot se connect karo</h2><p class="mut" style="max-width:480px;margin:0 auto 16px">Apne bot ka Railway domain yahan paste karo (sirf ek baar). Railway → web service → Settings → Networking me milta hai.</p><input id="ap" class="s" placeholder="https://xxxx.up.railway.app" style="max-width:420px"><br><br><a id="apb" class="btn g">💾 Save</a></div>`);
+  $("#apb").onclick=()=>{let v=$("#ap").value.trim();if(!v)return;if(!/^https?:\/\//.test(v))v="https://"+v;try{v=new URL(v).origin}catch(e){return toast("❌ Galat domain")}localStorage.setItem("api",v);location.reload()}}
 async function home(){
   let s={servers:0,users:0,commands:0,uptime:0,invite:"#",name:"AURA BOT"};
   try{s=await api("/api/stats");$("#bn").textContent=s.name.toUpperCase()}catch(e){}
@@ -168,18 +171,20 @@ async function guild(id,mod="main"){
     try{await api(P+"/announce",{method:"POST",body:JSON.stringify({channel:$("#ac").value,title:$("#at").value,text:$("#am").value})});toast("✅ SENT!");$("#am").value=""}catch(x){toast(x.message==="slow"?"⏳ 5 SEC RUKO":"❌ CHANNEL+MSG DAALO")}}}
 
 async function route(){
-  if(location.hash.startsWith("#token=")){localStorage.setItem("tk",location.hash.slice(7));ME=null;location.hash="#/dashboard";return}
-  if(API.includes("YOUR-APP"))return go('<div class="panel">⚙️ Setup baaki: <b>index.html</b> me <b>API</b> wali line me apna Railway domain daalo.</div>');
+  if(location.hash.startsWith("#token=")){localStorage.setItem("tk",location.hash.slice(7));localStorage.setItem("seen","1");sessionStorage.removeItem("rl");ME=null;location.hash="#/dashboard";return}
+  if(!API)return setup();
   const [,p,id,m]=(location.hash.slice(1)||"/").split("/");
   document.querySelectorAll(".links a.l").forEach(a=>a.classList.toggle("on",a.dataset.p===(p||"")));
   const au=$("#auth");
   if(tok()){au.textContent="Logout";au.href="#/";au.onclick=()=>{localStorage.removeItem("tk");ME=null;GC=null;$("#who").innerHTML="";setTimeout(route)};
     me().then(x=>{$("#who").innerHTML=x.user.avatar?`<img class="av" src="${E(x.user.avatar)}" alt="">`:""}).catch(()=>{})}
   else{au.textContent="Login";au.href=API+"/login?site=1";au.onclick=null}
+  if(!tok()&&p==="dashboard")relog();
   app.innerHTML='<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
   try{if(p==="commands")await cmds();else if(p==="dashboard")await(id?guild(id,m||"main"):dash());else await home()}
   catch(e){go(e.status===401?loginCard():`<div class="panel">⚠️ Bot se connect nahi ho paya. Bot online hai? <span class="mut">(${E(e.message)})</span></div>`)}}
 addEventListener("hashchange",route);route();
+$("#rst").onclick=()=>{localStorage.removeItem("api");location.reload()};
 
 // ====== ANIMATED BACKGROUNDS (3 modes) ======
 (()=>{const cv=$("#bg"),c=cv.getContext("2d"),R=Math.random,dpr=Math.min(devicePixelRatio||1,1.5),NM=["🌌 Galaxy","✨ Network","🌈 Aurora"];
