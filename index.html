@@ -55,7 +55,7 @@ footer{text-align:center;color:#ddd;padding:24px 0 8px;text-shadow:2px 2px #000}
 <canvas id="bg" width="320" height="180"></canvas><div class="veil"></div>
 <div class="wrap">
 <nav class="panel"><a class="logo" href="#/">⛏ <span id="bn">AURA BOT</span></a>
-<div class="links"><a class="l" data-p="" href="#/">Home</a><a class="l" data-p="dashboard" href="#/dashboard">Dashboard</a><a class="l" data-p="commands" href="#/commands">Commands</a><span id="who"></span><a id="auth" class="btn g sm">Login</a></div></nav>
+<div class="links"><a class="l" data-p="" href="#/">Home</a><a class="l" data-p="dashboard" href="#/dashboard">Dashboard</a><a class="l" data-p="commands" href="#/commands">Commands</a><a id="th" class="btn sm">🎨 Theme</a><span id="who"></span><a id="auth" class="btn g sm">Login</a></div></nav>
 <main id="app"></main>
 <footer>⛏ Made with ❤ • Aura Bot</footer>
 </div>
@@ -150,12 +150,22 @@ async function route(){
   catch(e){go(e.status===401?loginCard():`<div class="panel">⚠️ Bot se connect nahi ho paya. Bot online hai? <span class="mut">(${E(e.message)})</span></div>`)}}
 addEventListener("hashchange",route);route();
 
-// ====== MINECRAFT PVP BACKGROUND ======
+// ====== MINECRAFT PVP BACKGROUND (5 themes) ======
 (()=>{const cv=$("#bg"),c=cv.getContext("2d"),W=320,H=180,GY=132;let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+const TH=[
+ {n:"☀ Day",sk:["#5b8cff","#bfe3ff"],sun:"#ffe97a",cl:"#fff",g:["#5db13f","#4f9a35","#8b5a2b","#7a4e25","#7d7d7d","#6e6e6e"],tr:["#6b4a22","#2f8f2f","#3aa83a"],st:0,fx:0},
+ {n:"🌙 Night",sk:["#050818","#1b2a5c"],sun:"#e8edff",cl:"#2a3566",g:["#2f6b24","#275a1e","#5a3a1c","#4e3118","#5a5a5a","#4c4c4c"],tr:["#3f2c14","#1d5a1d","#25702a"],st:1,fx:0},
+ {n:"🔥 Nether",sk:["#2b0505","#8a2410"],sun:"#ff9d2e",cl:"#5a1a12",g:["#8a3030","#7a2828","#6e2f2f","#5e2626","#4b1c1c","#3f1616"],tr:["#3a1010","#8a1c1c","#c03a1a"],st:0,fx:"ember"},
+ {n:"🌌 End",sk:["#0b0614","#2a1250"],sun:"#d9b8ff",cl:"#3a2266",g:["#e5e2a8","#d8d49a","#d3cf94","#c6c286","#b9b57a","#a9a56c"],tr:["#15101f","#2a1b44","#6b3fb0"],st:1,fx:"portal"},
+ {n:"❄ Snow",sk:["#8fb4e8","#e6f1ff"],sun:"#fff6c8",cl:"#fff",g:["#f4faff","#dfeaf5","#8b5a2b","#7a4e25","#7d7d7d","#6e6e6e"],tr:["#5b3d1c","#1f6f3d","#2b8a4f"],st:0,fx:"snow"}];
+let ti=+(localStorage.getItem("th")??1)%TH.length,T=TH[ti];
 const gr=document.createElement("canvas");gr.width=W;gr.height=H-GY;const g=gr.getContext("2d");
-for(let y=0;y<H-GY;y+=4)for(let x=0;x<W;x+=4){const r=rnd()<.5;g.fillStyle=y<4?(r?"#5db13f":"#4f9a35"):y<28?(r?"#8b5a2b":"#7a4e25"):(r?"#7d7d7d":"#6e6e6e");g.fillRect(x,y,4,4)}
+const stars=Array.from({length:45},()=>[(rnd()*W)|0,(rnd()*100)|0]);
+function ground(){sd=7;const q=T.g;for(let y=0;y<H-GY;y+=4)for(let x=0;x<W;x+=4){const r=rnd()<.5;g.fillStyle=y<4?q[r?0:1]:y<28?q[r?2:3]:q[r?4:5];g.fillRect(x,y,4,4)}}
+function theme(i){ti=i%TH.length;T=TH[ti];localStorage.setItem("th",ti);ground();$("#th").textContent="🎨 "+T.n;$(".veil").style.background=T.st?"rgba(0,0,10,.35)":"rgba(8,10,18,.45)"}
+$("#th").onclick=()=>theme(ti+1);theme(ti);
 const cl=[{x:40,y:22,w:44,s:.06},{x:170,y:40,w:56,s:.04},{x:280,y:16,w:40,s:.07}];
-const mk=(x,f,col)=>({x,ox:x,y:GY,vy:0,vx:0,f,col,hp:10,cd:30,sw:0,fl:0,dead:0}),A=mk(90,1,"#2d7ddb"),B=mk(230,-1,"#d33"),ps=[];
+const mk=(x,f,col)=>({x,ox:x,y:GY,vy:0,vx:0,f,col,hp:10,cd:30,sw:0,fl:0,dead:0}),A=mk(90,1,"#2d7ddb"),B=mk(230,-1,"#d33"),ps=[],fxp=[];
 const burst=(x,y,col,n)=>{for(let i=0;i<n;i++)ps.push({x,y,vx:(rnd()-.5)*3,vy:-rnd()*2.5,l:30,col})};
 function step(a,b){
   if(a.dead){if(--a.dead===0){a.hp=10;a.x=a.ox;a.vx=0}return}
@@ -171,12 +181,16 @@ function dr(a){if(a.dead)return;const x=Math.round(a.x),y=Math.round(a.y),f=a.f,
   c.fillStyle="#bde9ff";if(a.sw>=3&&a.sw<=8)c.fillRect(f>0?x+3:x-13,y-15,10,2);else c.fillRect(x+f*5-1,y-24,2,9);
   c.fillStyle="#6b4a22";c.fillRect(x+f*4-1,y-15,3,2);c.fillStyle="#111";c.fillRect(x-7,y-30,14,3);c.fillStyle="#e33";c.fillRect(x-6,y-29,Math.max(0,a.hp)*1.2,1)}
 function frame(){
-  const sk=c.createLinearGradient(0,0,0,GY);sk.addColorStop(0,"#5b8cff");sk.addColorStop(1,"#bfe3ff");c.fillStyle=sk;c.fillRect(0,0,W,H);
-  c.fillStyle="#ffe97a";c.fillRect(250,14,16,16);c.fillStyle="#fff";
-  cl.forEach(k=>{k.x=(k.x+k.s)%(W+60);c.fillRect(k.x-40,k.y,k.w,6);c.fillRect(k.x-34,k.y-4,k.w-12,4)});
-  [30,285].forEach(t=>{c.fillStyle="#6b4a22";c.fillRect(t,GY-22,5,22);c.fillStyle="#2f8f2f";c.fillRect(t-9,GY-40,23,20);c.fillStyle="#3aa83a";c.fillRect(t-5,GY-44,15,6)});
-  c.drawImage(gr,0,GY);step(A,B);step(B,A);dr(A);dr(B);
-  for(let i=ps.length-1;i>=0;i--){const p=ps[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.15;c.fillStyle=p.col;c.fillRect(p.x,p.y,2,2);if(--p.l<=0)ps.splice(i,1)}
+  const sk=c.createLinearGradient(0,0,0,GY);sk.addColorStop(0,T.sk[0]);sk.addColorStop(1,T.sk[1]);c.fillStyle=sk;c.fillRect(0,0,W,H);
+  if(T.st){c.fillStyle="#fff";stars.forEach(s=>c.fillRect(s[0],s[1],1,1))}
+  c.fillStyle=T.sun;c.fillRect(250,14,16,16);c.fillStyle=T.cl;
+  cl.forEach(k=>{k.x=(k.x+k.s)%(W+60);c.fillRect(Math.round(k.x-40),k.y,k.w,6);c.fillRect(Math.round(k.x-34),k.y-4,k.w-12,4)});
+  [30,285].forEach(t=>{c.fillStyle=T.tr[0];c.fillRect(t,GY-22,5,22);c.fillStyle=T.tr[1];c.fillRect(t-9,GY-40,23,20);c.fillStyle=T.tr[2];c.fillRect(t-5,GY-44,15,6)});
+  c.drawImage(gr,0,GY);
+  if(T.fx&&fxp.length<50&&rnd()<.4)fxp.push({x:rnd()*W,y:T.fx==="ember"?GY:T.fx==="snow"?0:rnd()*GY,vy:T.fx==="snow"?.4+rnd()*.4:-(.3+rnd()*.5),l:220,c:T.fx==="snow"?"#fff":T.fx==="ember"?"#ff9d2e":"#b46bff"});
+  for(let i=fxp.length-1;i>=0;i--){const p=fxp[i];p.y+=p.vy;p.x+=Math.sin(p.y/10)*.2;c.fillStyle=p.c;c.fillRect(Math.round(p.x),Math.round(p.y),2,2);if(p.y<0||p.y>GY||--p.l<=0)fxp.splice(i,1)}
+  step(A,B);step(B,A);dr(A);dr(B);
+  for(let i=ps.length-1;i>=0;i--){const p=ps[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.15;c.fillStyle=p.col;c.fillRect(Math.round(p.x),Math.round(p.y),2,2);if(--p.l<=0)ps.splice(i,1)}
   if(!matchMedia("(prefers-reduced-motion:reduce)").matches)requestAnimationFrame(frame)}
 frame()})();
 </script></body></html>
